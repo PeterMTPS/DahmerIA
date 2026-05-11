@@ -1,0 +1,533 @@
+/* =========================================================
+   DahmerIA — estilos da interface de chat
+   Paleta: tons escuros + acentos roxo/ciano. Tudo em uma
+   única coluna centralizada para foco no conteúdo.
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* 💖 Tema Pinkie Pie 💖 */
+  --bg: #fff0f6;            /* rosa bem clarinho de base */
+  --surface: #ffffff;        /* branco pras bolhas/cabeçalho */
+  --surface-2: #ffe4ef;      /* rosa pastel pros botões secundários */
+  --border: #ffc2d8;         /* rosa pra contornos */
+  --text: #4a1530;           /* rosa-vinho escuro pra texto (boa leitura) */
+  --text-dim: #a05478;       /* rosa médio pra texto secundário */
+  --accent: #ff4d8d;         /* rosa pink principal (botões, ações) */
+  --accent-2: #ff85b3;       /* rosa mais claro (hovers, fórmulas) */
+  --user: #ffd0e2;           /* bolha do usuário em rosa pastel */
+  --bot: #ffffff;            /* bolha da IA em branco com sombra */
+  --danger: #e91e63;         /* rosa fúcsia pra erro */
+  --ok: #ff69b4;             /* rosa hot pink pra status online */
+}
+
+html, body {
+  height: 100%;
+}
+
+html {
+  /* Evita o "punch zoom" do iOS quando rotaciona a tela. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg); /* fallback flat */
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+               'Helvetica Neue', Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* dvh = dynamic viewport height — ajusta quando a barra do Safari aparece/some.
+     Usar DEPOIS do 100vh pra navegadores antigos terem fallback. */
+  min-height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Fundo da Pinkie Pie em camada SEPARADA (pseudo-elemento fixo).
+ *
+ * Por que assim e não com background-attachment: fixed no body?
+ *   -> iOS Safari ignora background-attachment: fixed (bug histórico).
+ *   -> Esta abordagem com ::before fixed funciona em iOS, Android e desktop.
+ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(255, 240, 246, 0.78), rgba(255, 220, 235, 0.78)),
+    url('pinkiepie.png') center/cover no-repeat;
+}
+
+/* ---------- Header ---------- */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;            /* fica redondinho, mais fofo */
+  object-fit: cover;             /* corta a imagem mantendo proporção */
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border: 2px solid white;
+  box-shadow: 0 6px 20px rgba(255, 77, 141, 0.35);
+}
+
+.logo h1 {
+  font-size: 18px;
+  letter-spacing: 0.2px;
+}
+
+.logo p {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.reset-btn {
+  background: var(--surface-2);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 150ms ease;
+  flex-shrink: 0;
+}
+.reset-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: white;
+  transform: rotate(-45deg);
+}
+
+.provider-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.provider-selector label {
+  white-space: nowrap;
+}
+
+.provider-selector select {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  /* No desktop: 13px fica enxuto e elegante.
+     No mobile: subimos pra 14px na media query (select não dá zoom no iOS). */
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 150ms ease;
+  -webkit-appearance: none;
+  appearance: none;
+  /* Setinha customizada (o appearance:none tira a default) */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a05478' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 26px;
+}
+
+.provider-selector select:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.provider-selector select:focus {
+  border-color: var(--accent);
+}
+
+.provider-selector select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #555;
+}
+.dot.online  { background: var(--ok);     box-shadow: 0 0 8px var(--ok); }
+.dot.offline { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+
+/* ---------- Chat ---------- */
+.chat {
+  flex: 1;
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 24px 16px 160px; /* padding-bottom dá espaço pro composer fixo */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.message {
+  display: flex;
+  gap: 10px;
+  animation: fade-in 220ms ease-out;
+}
+
+.message-user  { justify-content: flex-end; }
+.message-bot   { justify-content: flex-start; }
+
+.bubble {
+  max-width: 80%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  line-height: 1.55;
+  font-size: 15px;
+  word-wrap: break-word;
+  position: relative;
+  border: 1px solid var(--border);
+}
+
+.message-user .bubble {
+  background: linear-gradient(135deg, #ffb3d1, var(--user));
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.message-bot .bubble {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 4px 14px rgba(255, 77, 141, 0.12);
+}
+
+.bubble img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 8px;
+  border: 1px solid var(--border);
+}
+
+.bubble p + p { margin-top: 8px; }
+.bubble ul, .bubble ol { padding-left: 22px; margin: 8px 0; }
+.bubble li { margin: 4px 0; }
+.bubble h1, .bubble h2, .bubble h3 {
+  margin: 14px 0 6px;
+  line-height: 1.25;
+}
+.bubble h2 { font-size: 18px; color: var(--accent-2); }
+.bubble h3 { font-size: 16px; }
+.bubble code {
+  background: #fff5fa;
+  color: #c2185b;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+}
+.bubble pre {
+  background: #fff5fa !important;
+  color: var(--text);
+  padding: 12px;
+  border-radius: 10px;
+  margin: 10px 0;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+}
+.bubble pre code { background: transparent; border: none; padding: 0; color: inherit; }
+
+.bubble strong { color: var(--accent); }
+
+.welcome { animation: none; }
+
+/* Cabeçalho da bolha do bot (com botão copiar) */
+.bot-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  gap: 8px;
+}
+
+.copy-btn {
+  background: var(--surface-2);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+.copy-btn:hover { color: var(--text); border-color: var(--accent); }
+.copy-btn.copied { color: var(--ok); border-color: var(--ok); }
+
+/* Loading (3 bolinhas) */
+.typing { display: flex; gap: 4px; padding: 4px 0; }
+.typing span {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--text-dim);
+  animation: bounce 1.2s infinite ease-in-out;
+}
+.typing span:nth-child(2) { animation-delay: 0.15s; }
+.typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0);   opacity: 0.4; }
+  40%           { transform: translateY(-6px); opacity: 1;   }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Caixa que mostra "Texto extraído da imagem (OCR)" */
+.ocr-box {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #fff5fa;
+  border: 1px dashed var(--accent-2);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+}
+.ocr-box::before {
+  content: "Texto extraído da imagem (OCR):";
+  display: block;
+  font-weight: 600;
+  color: var(--accent-2);
+  margin-bottom: 4px;
+}
+
+/* ---------- Composer (área de envio) ---------- */
+.composer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(255, 240, 246, 0.95) 60%, transparent);
+  /* env(safe-area-inset-bottom) = espaço da barra inferior do iPhone (home indicator).
+     Sem isso, o composer fica embaixo da barrinha e os botões ficam parcialmente cortados. */
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  z-index: 5;
+}
+
+.composer-row {
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 10px;
+  box-shadow: 0 10px 30px rgba(255, 77, 141, 0.18);
+}
+
+.upload-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  transition: all 150ms ease;
+  flex-shrink: 0;
+}
+.upload-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.upload-btn.has-image {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+
+textarea#message {
+  flex: 1;
+  background: transparent;
+  color: var(--text);
+  border: none;
+  outline: none;
+  /* IMPORTANTE: 16px é o mínimo pra iOS NÃO dar zoom automático ao focar.
+     Qualquer valor abaixo disso faz o Safari mobile dar zoom in agressivo. */
+  font-size: 16px;
+  font-family: inherit;
+  resize: none;
+  max-height: 160px;
+  padding: 10px 6px;
+  line-height: 1.4;
+  /* Evita comportamento estranho do iOS com placeholder centralizado */
+  -webkit-appearance: none;
+  appearance: none;
+}
+textarea#message::placeholder { color: var(--text-dim); }
+
+.send-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #ff2e7c);
+  border: none;
+  color: white;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 150ms ease;
+  flex-shrink: 0;
+}
+.send-btn:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 6px 18px rgba(255, 77, 141, 0.55);
+}
+.send-btn:disabled {
+  background: var(--surface-2);
+  color: var(--text-dim);
+  cursor: not-allowed;
+}
+
+.hint {
+  max-width: 880px;
+  margin: 6px auto 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  text-align: center;
+}
+.hint.error { color: var(--danger); }
+
+/* Pré-visualização da imagem anexada */
+.preview {
+  max-width: 880px;
+  margin: 0 auto 8px;
+  position: relative;
+  display: inline-flex;
+}
+.preview.hidden { display: none; }
+.preview img {
+  max-height: 120px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.preview button {
+  position: absolute;
+  top: -8px; right: -8px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+
+/* =================================================================
+   MOBILE — iPhone, Android e telas pequenas em geral
+   ================================================================= */
+@media (max-width: 640px) {
+  /* Header mais enxuto pra caber na tela do celular */
+  .app-header {
+    padding: 10px 12px;
+    /* No iPhone com notch, respeita a área segura no topo */
+    padding-top: calc(10px + env(safe-area-inset-top));
+  }
+
+  .logo { gap: 8px; }
+  .logo h1 { font-size: 16px; }
+  .logo p { display: none; }
+  .logo-mark { width: 36px; height: 36px; }
+
+  /* Header direito mais compacto: só seletor + ponto de status (sem texto) */
+  .header-right { gap: 8px; }
+  .provider-selector label { display: none; }
+  .provider-selector select {
+    padding: 6px 8px;
+    padding-right: 24px;
+    font-size: 14px;
+    /* No mobile, 14px é o mínimo razoável que cabe sem dar zoom em select.
+       (Diferente de input/textarea, select com font-size < 16 não dá zoom no iOS.) */
+  }
+  .status #status-text { display: none; }   /* só fica o pontinho colorido */
+
+  /* Bolhas mais largas no celular pra aproveitar o espaço */
+  .bubble {
+    max-width: 95%;
+    font-size: 15px;     /* 15 lê bem no iPhone */
+    padding: 12px 14px;
+    border-radius: 16px;
+  }
+
+  /* Espaço pra mensagem não ficar atrás do composer fixo */
+  .chat {
+    padding-bottom: calc(180px + env(safe-area-inset-bottom));
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  /* Composer sempre acessível ao polegar */
+  .composer-row {
+    padding: 8px;
+    gap: 8px;
+    border-radius: 16px;
+  }
+
+  /* Botões um pouco maiores pra dar conforto no toque (Apple recomenda 44×44) */
+  .upload-btn, .send-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Pré-visualização menor no mobile */
+  .preview img { max-height: 90px; }
+}
+
+/* Garante que em telas BEM pequenas (iPhone SE, ~375px) ainda funcione */
+@media (max-width: 380px) {
+  .logo h1 { font-size: 15px; }
+  .provider-selector select { max-width: 130px; }
+}

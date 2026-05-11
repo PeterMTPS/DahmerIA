@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Environment / secrets
+.env
+backend/.env
+
+# Local-only tunnel helper
+cloudflared.exe
+
+# Logs
+*.log

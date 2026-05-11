@@ -1,0 +1,24 @@
+# Versões mínimas (>=). Pip pega a mais recente compatível com sua versão
+# do Python. Importante pra Python 3.14, que precisa de wheels recentes.
+
+# Framework web (FastAPI + servidor uvicorn)
+fastapi>=0.115
+uvicorn[standard]>=0.32
+python-multipart>=0.0.12      # parser de multipart/form-data (upload de arquivo)
+
+# Cliente HTTP assíncrono pra falar com o Ollama
+httpx>=0.27
+
+# Processamento de imagem (resize, conversão pra RGB, remoção de EXIF)
+# Pillow >= 11 tem wheels pré-compilados pra Python 3.13 e 3.14.
+Pillow>=11.0
+
+# OCR. Só funciona se você tiver o TESSERACT instalado no sistema.
+# (No Windows: https://github.com/UB-Mannheim/tesseract/wiki)
+pytesseract>=0.3.13
+
+# Variáveis de ambiente do .env
+python-dotenv>=1.0.1
+
+# Cliente do Google Gemini (provider de IA na nuvem, free tier generoso)
+google-generativeai>=0.8

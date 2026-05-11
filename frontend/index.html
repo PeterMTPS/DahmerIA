@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DahmerIA — Assistente de Estudos</title>
+
+  <!-- Cor da barra do navegador no iOS/Android -->
+  <meta name="theme-color" content="#ff4d8d" />
+
+  <!-- Pra ficar bonitinho se ela adicionar à tela inicial do iPhone -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="DahmerIA" />
+  <link rel="apple-touch-icon" href="dahmer.png" />
+  <link rel="icon" type="image/png" href="dahmer.png" />
+
+  <!--
+    KaTeX: renderiza fórmulas LaTeX que vierem na resposta da IA.
+    Carregado por CDN para manter o projeto simples (sem build step).
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Marked: converte Markdown -> HTML. -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@14.1.3/marked.min.js"></script>
+
+  <!-- highlight.js: cores em blocos de código. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/github-dark.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/common.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo">
+      <img src="dahmer.png" class="logo-mark" alt="Dahmer" />
+      <div>
+        <h1>DahmerIA</h1>
+        <p>Seu tutor de estudos ihul — pergunte ou envie uma foto.</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <button id="reset-btn" class="reset-btn" type="button" title="Nova conversa">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1 4 1 10 7 10" />
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+        </svg>
+      </button>
+      <div class="provider-selector">
+        <label for="provider">IA:</label>
+        <select id="provider" disabled>
+          <option value="">Carregando...</option>
+        </select>
+      </div>
+      <div class="status" id="status">
+        <span class="dot" id="status-dot"></span>
+        <span id="status-text">Verificando...</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="chat" id="chat" aria-live="polite">
+    <!--
+      Mensagem inicial de boas-vindas.
+      As mensagens reais (do usuário e da IA) serão inseridas aqui via JS.
+    -->
+    <div class="message message-bot welcome">
+      <div class="bubble">
+        <p><strong>Oi</strong> meu bem 👋</p>
+        <p>
+          Você pode <strong>tirar uma foto da questão</strong> que quer resolver
+          (matemática, física, química, etc) ou simplesmente
+          <strong>escrever uma pergunta</strong> aqui embaixo. Os dois funcionam.
+      </div>
+    </div>
+  </main>
+
+  <form id="form" class="composer" autocomplete="off">
+    <!-- Pré-visualização da imagem antes de enviar -->
+    <div id="preview" class="preview hidden">
+      <img id="preview-img" alt="Pré-visualização da imagem" />
+      <button type="button" id="preview-remove" aria-label="Remover imagem">×</button>
+    </div>
+
+    <div class="composer-row">
+      <!-- Botão de upload (label estilizado controlando o input file invisível) -->
+      <label class="upload-btn" for="image" title="Anexar imagem (opcional)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <polyline points="21 15 16 10 5 21" />
+        </svg>
+        <input type="file" id="image" name="image" accept="image/*" hidden />
+      </label>
+
+      <textarea
+        id="message"
+        name="message"
+        placeholder="Pergunte algo ou anexe uma imagem da questão..."
+        rows="1"
+      ></textarea>
+
+      <button type="submit" id="send" class="send-btn" disabled title="Enviar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13" />
+          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+      </button>
+    </div>
+
+    <p class="hint" id="hint">Anexe uma imagem para liberar o envio.</p>
+  </form>
+
+  <script src="app.js"></script>
+</body>
+</html>
